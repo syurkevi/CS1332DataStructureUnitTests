@@ -35,19 +35,16 @@ public class testHashTable{
 		// Testing constructors
         
         idTable=new LinearProbingHashtable<Integer,String>();
-        assertEquals(0.75,idTable.getLF());
+        assertEquals(0.75,idTable.getLF(),0.001);
 
         idTable=new LinearProbingHashtable<Integer,String>(42);
         assertEquals(42,idTable.getArray().length);
 
         idTable=new LinearProbingHashtable<Integer,String>(42,0.4);
         assertEquals(42,idTable.getArray().length);
-        assertEquals(0.4,idTable.getLF());
-        
-        //idTable=new LinearProbingHashtable<Integer,String>(-1);//should throw exception
-        //idTable=new LinearProbingHashtable<Integer,String>(-1,-1);//should throw exception
+        assertEquals(0.4,idTable.getLF(),0.001);
     }
-    
+
     @Test 
     public void testClear(){
         idTable=new LinearProbingHashtable<Integer,String>();
@@ -84,14 +81,16 @@ public class testHashTable{
     @Test
     public void testGet(){
         System.out.println(" A poem: ");
+        System.out.println("");
         for(int i=0;i<40;++i){
             if(poemTable.get(i)!=null){
                 System.out.println(poemTable.get(i));
             }
         }
+        System.out.println("");
     }
     
-    @Test
+    @Test(expected=NullPointerException.class)
     public void testPutNull(){
         idTable=new LinearProbingHashtable<Integer,String>(11,0.5);
         idTable.put(3,null);
@@ -100,8 +99,8 @@ public class testHashTable{
 		
     @Test
     public void testPutRehash(){
-        idTable=new LinearProbingHashtable<Integer,String>(11,0.5);
-        assertEquals(11,idTable.getArray().length);
+        idTable=new LinearProbingHashtable<Integer,String>(10,0.5);
+        assertEquals(10,idTable.getArray().length);
 		idTable.put(0,"I");
 		idTable.put(1,"am");
 		idTable.put(2,"the");
@@ -110,13 +109,11 @@ public class testHashTable{
 		idTable.put(5,"of");
 		idTable.put(6,"a");
 		idTable.put(-7,"Modern-Major");
-		idTable.put(8, "General");
+		idTable.put(7, "General");
         assertTrue((idTable.getArray().length>11));
-        assertEquals(8,idTable.size());
-		idTable.put(-7, null);
+        assertEquals(9,idTable.size());
 		assertTrue(idTable.containsKey(-7));
 		assertTrue(idTable.containsValue("General"));
-		assertTrue(idTable.containsValue(null));
     }
 		
     @Test
@@ -133,7 +130,7 @@ public class testHashTable{
     public void testPutAll(){
         idTable=new LinearProbingHashtable<Integer,String>(11,0.5);
         idTable.put(0,":(");
-        assertEquals(1,Arrays.asList(idTable.getArray()).size());
+        assertEquals(1,nonNull(idTable.getArray()));
 
 		LinearProbingHashtable <Integer,String> copyMap=new LinearProbingHashtable<Integer,String>();
         copyMap.put(77,"Bring");
@@ -141,10 +138,10 @@ public class testHashTable{
         copyMap.put(-7,"shrubbery");
         assertFalse(idTable.containsKey(77));
 		idTable.putAll(copyMap);
-        assertEquals(4,Arrays.asList(idTable.getArray()).size());
+        assertEquals(4,nonNull(idTable.getArray()));
         copyMap.put(0,":)");
 		idTable.putAll(copyMap);
-        assertEquals(4,Arrays.asList(idTable.getArray()).size());
+        assertEquals(4,nonNull(idTable.getArray()));
         assertTrue(idTable.containsKey(77));
         assertFalse(idTable.containsValue(":("));
         assertTrue(idTable.containsValue(":)"));
@@ -169,7 +166,17 @@ public class testHashTable{
 		Collection<String> values=poemTable.values();		
         assertEquals(10,values.size());
         assertTrue(values.contains("An angel"));
-        assertTrue(values.contains("I don't blame you"));
+        assertFalse(values.contains("I don't blame you"));
+    }
+
+    public int nonNull(Object[] arr){
+        int non_null=0;
+        for(Object o:arr){
+            if(o!=null){
+                non_null++;
+            }
+        }
+        return non_null;
     }
 
 }
